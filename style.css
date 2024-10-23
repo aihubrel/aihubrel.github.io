@@ -1,61 +1,15 @@
-
-#root{
-    background-color: rgba(37, 154, 250, 0.39);
-    width: 80%;
-    border-radius: 10PX;
-    margin: auto;
+body{
+  text-align: center;
 }
 
-button {
-  border: 1px solid black !important;
-}
-
-.addButton {
-  font-size: 16px;
-  font-weight: 200;
-  letter-spacing: 1px;
-  padding: 13px 20px 13px;
-  outline: 0;
-  border: 1px solid black;
-  cursor: pointer;
-  position: relative;
-  background-color: rgba(0, 0, 0, 0);
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-}
-
-.addButton:after {
-  content: "";
-  background-color: #ffe54c;
-  width: 100%;
-  z-index: -1;
-  position: absolute;
-  height: 100%;
-  top: 7px;
-  left: 7px;
-  transition: 0.2s;
-}
-
-.addButton:hover:after {
-  top: 0px;
-  left: 0px;
+h2 {
+    color: rgba(23, 41, 141, 0.655)!important;
+    font-weight: bold;
+    font-size: 50px !important;
 }
 
 
-
-input {
-    width: 70px;
-  }
-
-table, th, td {
-    border: 1px solid rgba(83, 52, 237, 0.897) !important;
-    border-collapse: collapse !important;
-  }
-
-  @media (min-width: 768px) {
-    .addButton {
-      padding: 13px 50px 13px;
-    }
-  }
-
+.currency {
+  margin: 20px;
+ } 
+  
