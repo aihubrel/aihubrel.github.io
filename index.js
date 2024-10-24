@@ -1,158 +1,194 @@
+class Portfolio extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        portfolio: [
+          {
+            name: 'ABC Co.',
+            shares_owned: 20,
+            average_cost: 50,
+            market_price: 130
+          },{
+            name: 'Happy Inc.',
+            shares_owned: 5,
+            average_cost: 200,
+            market_price: 500
+          },{
+            name: 'Smile LLC',
+            shares_owned: 100,
+            average_cost: 20,
+            market_price: 15
+          }
+        ],
+        form: {
+          name: '',
+          shares_owned: 0,
+          average_cost: 0,
+          market_price: 0
+        }
+      };
+  
+      this.removeStock = this.removeStock.bind(this);
+      this.handleChange = this.handleChange.bind(this);
+      this.handleFormChange = this.handleFormChange.bind(this);
+      this.addStock = this.addStock.bind(this);
+    }
+  
+    removeStock(index) {
+      const portfolio = this.state.portfolio.slice(); // shallow copy
+      portfolio.splice(index, 1); // remove value at index
+  
+      this.setState({ portfolio });
+    }
 
-class CurrencyConverter extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      //Euro
-      rate: 0.89,
-      usd: 1,
-      euro: 1 * 0.89,
-      //JPN
-      jrate: 149,
-      jusd: 1,
-      jpn: 1 * 149,
-      //Canada$
-      crate: 1.38,
-      cusd: 1,
-      cad: 1 * 1.38,
-    };
+    
+    handleChange(event, index) {
+      const portfolio = this.state.portfolio.slice(); // shallow copy
+      const { name, value } = event.target;
+  
+      portfolio[index][name] = value;
+      this.setState({ portfolio });
+    }
+  
+    handleFormChange(event) {
+      const { name, value } = event.target;
+      const { form } = this.state;
+  
+      form[name] = value;
+      this.setState({ form });
+    }
+  
+    addStock(event) {
+      event.preventDefault();
+      const portfolio = this.state.portfolio.slice();
+  
+      portfolio.push(this.state.form);
+      this.setState({
+        portfolio,
+        form: {
+          name: '',
+          shares_owned: 0,
+          average_cost: 0,
+          market_price: 0
+        }
+      });
+      // reset form to empty
+    }
+  
+    render() {
+      const {
+        portfolio,
+        form,
+      } = this.state;
+      
+      const portfolio_market_value = portfolio.reduce((sum, stock) => stock.shares_owned * stock.market_price + sum, 0);
+      const portfolio_cost = portfolio.reduce((sum, stock) => stock.shares_owned * stock.average_cost + sum, 0);
+      const portfolio_gain_loss = portfolio_market_value - portfolio_cost;
+      const ratio_gain_loss = ((portfolio_gain_loss  / portfolio_market_value) * 100).toFixed(2);
+      return (
+        <div className="container">
+          <h1 className="text-center my-4">Stock Portfolio</h1>
+          <div className="row">
+            <div className="col-12">
+              <table className="table table-responsive">
+                <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Average cost ($)</th>
+                    <th scope="col">Price per stock  ($)</th>
+                    <th scope="col">Account Value ($)</th>
+                    <th scope="col">Unrealized Gain/Loss ($)</th>
+                    <th scope="col">Gain/Loss (%)</th>
+                    <th scope="col">Remove</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {portfolio.map((stock, index) => {
+                    const {
+                      name,
+                      shares_owned,
+                      average_cost,
+                      market_price,
+                    } = stock;
+  
+                    const market_value = shares_owned * market_price;
+                    const unrealized_gain_loss = market_value - shares_owned * average_cost;
+                    const percentage = ((unrealized_gain_loss / market_value) * 100).toFixed(2);
+                    // Adopting the underscore_style for consistency
+  
+                    return (
+                      <tr key={index}>
+                        <td>{name}</td>
+                        <td><input onChange={e => this.handleChange(e, index)} type="number" name="shares_owned" value={shares_owned} /></td>
+                        <td><input onChange={e => this.handleChange(e, index)} type="number" name="average_cost" value={average_cost} /></td>
+                        <td><input onChange={e => this.handleChange(e, index)} type="number" name="market_price" value={market_price} /></td>
+                        <td>{market_value}</td>
+                        <td>{unrealized_gain_loss}</td>
+                        <td>{percentage}</td>
+                        <td><button className="btn  btn-sm" onClick={() => this.removeStock(index)}>remove</button></td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
 
-    this.handleUsdChange = this.handleUsdChange.bind(this);
-    this.handleEuroChange = this.handleEuroChange.bind(this);
-    this.handleUSDtoJPN = this.handleUSDtoJPN.bind(this);
-    this.handleJPNtoUSD = this.handleJPNtoUSD.bind(this);
-    this.handleUSDtoCAD = this.handleUSDtoCAD.bind(this);
-    this.handleCADtoUSD = this.handleCADtoUSD.bind(this);
-  }
+            <form className="col-12 mt-2 mb-4" onSubmit={this.addStock}>
+            <label for="name">Name</label>
+              <input
+                className="mx-2"
+                name="name"
+                type="text"
+                placeholder="Name"
+                onChange={this.handleFormChange}
+                value={form.name}
+                required
+              />
+              <label for="shares_owned">Quantity</label>
+              <input
+                className="mx-2"
+                name="shares_owned"
+                type="number"
+                placeholder="Shares"
+                value={form.shares_owned}
+                onChange={this.handleFormChange}
+              />
+              <label for="average_cost">Average cost ($)</label>
+              <input
+                className="mx-2"
+                name="average_cost"
+                type="number"
+                placeholder="Cost"
+                value={form.average_cost}
+                onChange={this.handleFormChange}
+              />
+              <label for="market_price">Price per stock ($)	</label>
+              <input
+                className="mx-2"
+                name="market_price"
+                type="number"
+                placeholder="Price"
+                value={form.market_price}
+                onChange={this.handleFormChange}
+              />
+              <button className="btn btn-sm addButton"  role="button">Add</button>
+            </form>   
 
-  toUsd(amount, rate) {
-    return amount * (1 / rate);
-  }
-
-  toEuro(amount, rate) {
-    return amount * rate;
-  }
-
-  toJtU (amount, rate) {
-    return amount  * (1 / rate);
+            <div className="col-12 col-md-6">
+              <h4 className="mb-3">Portfolio value: $ {portfolio_market_value}</h4>
+            </div>
+            <div className="col-12 col-md-6">
+              <h4 className="mb-3">Portfolio gain/loss: $ {portfolio_gain_loss} : {ratio_gain_loss} % </h4>
+            </div>
+          </div>
+        </div>
+      );
+    }
   }
   
-  toUtJ(amount, rate) {
-    return amount * rate;
-  }
-
-  toCtU (amount, rate) {
-    return amount * rate;
-  }
-
-  toUtC (amount, rate) {
-    return amount * rate;
-  }
-
-  convert(amount, rate, equation) {
-    console.log(typeof amount);
-    const input = parseFloat(amount);
-    if (Number.isNaN(input)) {
-      return '';
-    }
-    return equation(input, rate).toFixed(3);
-  }
-
-  handleUsdChange(event) {
-    const euro = this.convert(event.target.value, this.state.rate, this.toEuro);
-    this.setState({
-      usd: event.target.value,
-      euro
-    });
-  }
-
-  handleEuroChange(event) {
-    const usd = this.convert(event.target.value, this.state.rate, this.toUsd);
-    this.setState({
-      euro: event.target.value,
-      usd
-    });
-  }
-
-  handleJPNtoUSD(event) {
-    const jusd = this.convert(event.target.value, this.state.jrate, this.toJtU);
-    this.setState({
-      jpn: event.target.value,
-      jusd
-    });
-  }
-
-  handleUSDtoJPN(event) {
-    const jpn = this.convert(event.target.value, this.state.jrate, this.toUtJ);
-    this.setState({
-      jusd: event.target.value,
-      jpn
-    });
-  }
-
-  handleCADtoUSD(event) {
-    const cusd = this.convert(event.target.value, this.state.crate, this.toCtU);
-    this.setState({
-      cad: event.target.value,
-      cusd
-    });
-  }
-
-  handleUSDtoCAD(event) {
-    const cad = this.convert(event.target.value, this.state.crate, this.toUtC);
-    this.setState({
-      cusd: event.target.value,
-      cad
-    });
-  }
-
-  render() {
-    const { rate, usd, euro } = this.state;
-    const { jrate, jusd, jpn} = this.state;
-    const { crate, cusd, cad} = this.state;
-
-
-    return (
-      <div className="container">
-        <div className="text-center p-3 mb-2">
-          <h2 className="mb-2">Currency Converter</h2>
-          <h4>USD 1 : {rate} EURO</h4>
-          <h4>USD 1 : {jrate} JPN</h4>
-          <h4>USD 1 : {crate} CND</h4>
-        </div>
-        <div className="row text-center">
-          <div className="col-12 currency">
-            <span className="mr-1">USD</span>
-            <input value={usd} onChange={this.handleUsdChange} type="number" />
-            <span className="mx-3">=</span>
-            <input value={euro} onChange={this.handleEuroChange} type="number" />
-            <span className="ml-1">EURO</span>
-          </div>
-          
-          <div className="col-12 currency">
-            <span className="mr-1">USD</span>
-            <input value={jusd} onChange={this.handleUSDtoJPN} type="number" />
-            <span className="mx-3">=</span>
-            <input value={jpn} onChange={this.handleJPNtoUSD} type="number" />
-            <span className="ml-1">JPN</span>
-          </div>
-
-          
-          <div className="col-12 currency">
-            <span className="mr-1">USD</span>
-            <input value={cusd} onChange={this.handleUSDtoCAD} type="number" />
-            <span className="mx-3">=</span>
-            <input value={cad} onChange={this.handleCADtoUSD} type="number" />
-            <span className="ml-1">CAD</span>
-          </div>
-
-        </div>
-      </div>
-    )
-  }
-  // 
-}
-
-const container = document.getElementById('root');
-const root = ReactDOM.createRoot(container);
-root.render(<CurrencyConverter />);
+  
+  const container = document.getElementById('root');
+  const root = ReactDOM.createRoot(container);
+  root.render(<Portfolio />);
+  
